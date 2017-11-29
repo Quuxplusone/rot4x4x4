@@ -7,6 +7,13 @@ inline constexpr uint64_t rotl(uint64_t x, int k)
 
 inline constexpr uint64_t delta_swap(uint64_t a, int delta, uint64_t mask)
 {
-    uint64_t b = (a ^ (a << delta)) & mask;
-    return a ^ b ^ (b >> delta);
+    if (((mask >> delta) ^ mask) == 0xFFFF'FFFF'FFFF'FFFF) {
+        // Neither Clang nor GCC can figure out that this rewrite is safe,
+        // but both are capable of evaluating the above expression at
+        // compile time. So we're just helping them out here.
+        return ((a << delta) & mask) | ((a & mask) >> delta);
+    } else {
+        uint64_t b = (a ^ (a << delta)) & mask;
+        return a ^ b ^ (b >> delta);
+    }
 }
