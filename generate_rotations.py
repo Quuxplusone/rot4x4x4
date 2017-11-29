@@ -11,7 +11,7 @@ def to_hex(mask):
         ((mask >> 0) & 0xFFFF),
     )
 
-def function_defn(function_name, original, rotated):
+def rotl_function_defn(function_name, original, rotated):
     bits_by_rotation = {}
     for b in xrange(64):
         o = original.index(b)
@@ -106,10 +106,11 @@ rotated_around_z_axis = [
 
 print '#pragma once'
 print '#include <stdint.h>'
+print '#include "utilities.h"'
 print ''
-print function_defn('rotate_right_around_x_axis', original, rotated_around_x_axis)
-print function_defn('rotate_left_around_x_axis', rotated_around_x_axis, original)
-print function_defn('rotate_right_around_y_axis', original, rotated_around_y_axis)
-print function_defn('rotate_left_around_y_axis', rotated_around_y_axis, original)
-print function_defn('rotate_right_around_z_axis', original, rotated_around_z_axis)
-print function_defn('rotate_left_around_z_axis', rotated_around_z_axis, original)
+print rotl_function_defn('rotate_right_around_x_axis', original, rotated_around_x_axis)
+print rotl_function_defn('rotate_left_around_x_axis', rotated_around_x_axis, original)
+print rotl_function_defn('rotate_right_around_y_axis', original, rotated_around_y_axis)
+print rotl_function_defn('rotate_left_around_y_axis', rotated_around_y_axis, original)
+print rotl_function_defn('rotate_right_around_z_axis', original, rotated_around_z_axis)
+print rotl_function_defn('rotate_left_around_z_axis', rotated_around_z_axis, original)

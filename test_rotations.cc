@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-inline constexpr uint64_t rotl(uint64_t x, int k)
-{
-    return (x << k) | (x >> (64-k));
-}
-
 #include "rotations.h"
 
 uint64_t board_with_one_bit_set(int x, int y, int z)
@@ -22,6 +17,17 @@ static int passed, failed;
     } else { \
         passed += 1; \
     }
+
+void guess_mystery_rotation(uint64_t (*f)(uint64_t))
+{
+    uint64_t b = board_with_one_bit_set(1,0,0);
+    if (f(b) == board_with_one_bit_set(1,3,0)) puts("rotate_right_around_x_axis");
+    if (f(b) == board_with_one_bit_set(1,0,3)) puts("rotate_left_around_x_axis");
+    if (f(b) == board_with_one_bit_set(0,0,2)) puts("rotate_right_around_y_axis");
+    if (f(b) == board_with_one_bit_set(3,0,1)) puts("rotate_left_around_y_axis");
+    if (f(b) == board_with_one_bit_set(3,1,0)) puts("rotate_right_around_z_axis");
+    if (f(b) == board_with_one_bit_set(0,2,0)) puts("rotate_left_around_z_axis");
+}
 
 int main()
 {
@@ -43,11 +49,23 @@ int main()
     EXPECT((2,2,1), rotate_right_around_y_axis, (1,2,1));
     EXPECT((0,3,0), rotate_right_around_y_axis, (0,3,3));
 
+    EXPECT((0,0,3), rotate_left_around_y_axis, (0,0,0));
+    EXPECT((0,0,2), rotate_left_around_y_axis, (1,0,0));
+    EXPECT((1,1,1), rotate_left_around_y_axis, (2,1,1));
+    EXPECT((1,2,1), rotate_left_around_y_axis, (2,2,1));
+    EXPECT((0,3,3), rotate_left_around_y_axis, (0,3,0));
+
     EXPECT((0,0,0), rotate_right_around_z_axis, (3,0,0));
     EXPECT((1,0,0), rotate_right_around_z_axis, (3,1,0));
     EXPECT((2,1,1), rotate_right_around_z_axis, (2,2,1));
     EXPECT((2,2,1), rotate_right_around_z_axis, (1,2,1));
     EXPECT((0,3,0), rotate_right_around_z_axis, (0,0,0));
+
+    EXPECT((3,0,0), rotate_left_around_z_axis, (0,0,0));
+    EXPECT((3,1,0), rotate_left_around_z_axis, (1,0,0));
+    EXPECT((2,2,1), rotate_left_around_z_axis, (2,1,1));
+    EXPECT((1,2,1), rotate_left_around_z_axis, (2,2,1));
+    EXPECT((0,0,0), rotate_left_around_z_axis, (0,3,0));
 
     printf("All tests finished. %d passed, %d failed.\n", passed, failed);
 }
