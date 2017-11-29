@@ -1,71 +1,473 @@
+
 #include <stdio.h>
 #include <stdint.h>
 
 #include "rotations.h"
+#include "utilities.h"
 
-uint64_t board_with_one_bit_set(int x, int y, int z)
-{
-    return 1uLL << (16*z + 4*y + x);
-}
-
-using ULL = unsigned long long;
 static int passed, failed;
-#define EXPECT(input, f, expected) \
+#define EXPECT1(input, f, expected) \
     if (f(board_with_one_bit_set input) != board_with_one_bit_set expected) { \
-        printf("FAIL: %s(%s %016llx) = %016llx when we expected %016llx\n", #f, #input, (ULL)board_with_one_bit_set input, (ULL)f(board_with_one_bit_set input), (ULL)board_with_one_bit_set expected); \
+        printf("FAIL: %s(%s %016llx) = %016llx when we expected %016llx\n", \
+            #f, #input, (unsigned long long)board_with_one_bit_set input, \
+            (unsigned long long)f(board_with_one_bit_set input), \
+            (unsigned long long)board_with_one_bit_set expected); \
         failed += 1; \
     } else { \
         passed += 1; \
     }
 
-void guess_mystery_rotation(uint64_t (*f)(uint64_t))
+#define EXPECTb(input, f, expected) \
+    if (f(input) != expected) { \
+        printf("FAIL: %s(%016llx) = %016llx when we expected %016llx\n", \
+            #f, (unsigned long long)input, \
+            (unsigned long long)f(input), \
+            (unsigned long long)expected); \
+        failed += 1; \
+    } else { \
+        passed += 1; \
+    }
+
+
+void test_rotate_right_around_x_axis()
 {
-    uint64_t b = board_with_one_bit_set(1,0,0);
-    if (f(b) == board_with_one_bit_set(1,3,0)) puts("rotate_right_around_x_axis");
-    if (f(b) == board_with_one_bit_set(1,0,3)) puts("rotate_left_around_x_axis");
-    if (f(b) == board_with_one_bit_set(0,0,2)) puts("rotate_right_around_y_axis");
-    if (f(b) == board_with_one_bit_set(3,0,1)) puts("rotate_left_around_y_axis");
-    if (f(b) == board_with_one_bit_set(3,1,0)) puts("rotate_right_around_z_axis");
-    if (f(b) == board_with_one_bit_set(0,2,0)) puts("rotate_left_around_z_axis");
+    EXPECT1((0,0,0), rotate_right_around_x_axis, (0,3,0))
+    EXPECT1((0,0,1), rotate_right_around_x_axis, (0,2,0))
+    EXPECT1((0,0,2), rotate_right_around_x_axis, (0,1,0))
+    EXPECT1((0,0,3), rotate_right_around_x_axis, (0,0,0))
+    EXPECT1((0,1,0), rotate_right_around_x_axis, (0,3,1))
+    EXPECT1((0,1,1), rotate_right_around_x_axis, (0,2,1))
+    EXPECT1((0,1,2), rotate_right_around_x_axis, (0,1,1))
+    EXPECT1((0,1,3), rotate_right_around_x_axis, (0,0,1))
+    EXPECT1((0,2,0), rotate_right_around_x_axis, (0,3,2))
+    EXPECT1((0,2,1), rotate_right_around_x_axis, (0,2,2))
+    EXPECT1((0,2,2), rotate_right_around_x_axis, (0,1,2))
+    EXPECT1((0,2,3), rotate_right_around_x_axis, (0,0,2))
+    EXPECT1((0,3,0), rotate_right_around_x_axis, (0,3,3))
+    EXPECT1((0,3,1), rotate_right_around_x_axis, (0,2,3))
+    EXPECT1((0,3,2), rotate_right_around_x_axis, (0,1,3))
+    EXPECT1((0,3,3), rotate_right_around_x_axis, (0,0,3))
+    EXPECT1((1,0,0), rotate_right_around_x_axis, (1,3,0))
+    EXPECT1((1,0,1), rotate_right_around_x_axis, (1,2,0))
+    EXPECT1((1,0,2), rotate_right_around_x_axis, (1,1,0))
+    EXPECT1((1,0,3), rotate_right_around_x_axis, (1,0,0))
+    EXPECT1((1,1,0), rotate_right_around_x_axis, (1,3,1))
+    EXPECT1((1,1,1), rotate_right_around_x_axis, (1,2,1))
+    EXPECT1((1,1,2), rotate_right_around_x_axis, (1,1,1))
+    EXPECT1((1,1,3), rotate_right_around_x_axis, (1,0,1))
+    EXPECT1((1,2,0), rotate_right_around_x_axis, (1,3,2))
+    EXPECT1((1,2,1), rotate_right_around_x_axis, (1,2,2))
+    EXPECT1((1,2,2), rotate_right_around_x_axis, (1,1,2))
+    EXPECT1((1,2,3), rotate_right_around_x_axis, (1,0,2))
+    EXPECT1((1,3,0), rotate_right_around_x_axis, (1,3,3))
+    EXPECT1((1,3,1), rotate_right_around_x_axis, (1,2,3))
+    EXPECT1((1,3,2), rotate_right_around_x_axis, (1,1,3))
+    EXPECT1((1,3,3), rotate_right_around_x_axis, (1,0,3))
+    EXPECT1((2,0,0), rotate_right_around_x_axis, (2,3,0))
+    EXPECT1((2,0,1), rotate_right_around_x_axis, (2,2,0))
+    EXPECT1((2,0,2), rotate_right_around_x_axis, (2,1,0))
+    EXPECT1((2,0,3), rotate_right_around_x_axis, (2,0,0))
+    EXPECT1((2,1,0), rotate_right_around_x_axis, (2,3,1))
+    EXPECT1((2,1,1), rotate_right_around_x_axis, (2,2,1))
+    EXPECT1((2,1,2), rotate_right_around_x_axis, (2,1,1))
+    EXPECT1((2,1,3), rotate_right_around_x_axis, (2,0,1))
+    EXPECT1((2,2,0), rotate_right_around_x_axis, (2,3,2))
+    EXPECT1((2,2,1), rotate_right_around_x_axis, (2,2,2))
+    EXPECT1((2,2,2), rotate_right_around_x_axis, (2,1,2))
+    EXPECT1((2,2,3), rotate_right_around_x_axis, (2,0,2))
+    EXPECT1((2,3,0), rotate_right_around_x_axis, (2,3,3))
+    EXPECT1((2,3,1), rotate_right_around_x_axis, (2,2,3))
+    EXPECT1((2,3,2), rotate_right_around_x_axis, (2,1,3))
+    EXPECT1((2,3,3), rotate_right_around_x_axis, (2,0,3))
+    EXPECT1((3,0,0), rotate_right_around_x_axis, (3,3,0))
+    EXPECT1((3,0,1), rotate_right_around_x_axis, (3,2,0))
+    EXPECT1((3,0,2), rotate_right_around_x_axis, (3,1,0))
+    EXPECT1((3,0,3), rotate_right_around_x_axis, (3,0,0))
+    EXPECT1((3,1,0), rotate_right_around_x_axis, (3,3,1))
+    EXPECT1((3,1,1), rotate_right_around_x_axis, (3,2,1))
+    EXPECT1((3,1,2), rotate_right_around_x_axis, (3,1,1))
+    EXPECT1((3,1,3), rotate_right_around_x_axis, (3,0,1))
+    EXPECT1((3,2,0), rotate_right_around_x_axis, (3,3,2))
+    EXPECT1((3,2,1), rotate_right_around_x_axis, (3,2,2))
+    EXPECT1((3,2,2), rotate_right_around_x_axis, (3,1,2))
+    EXPECT1((3,2,3), rotate_right_around_x_axis, (3,0,2))
+    EXPECT1((3,3,0), rotate_right_around_x_axis, (3,3,3))
+    EXPECT1((3,3,1), rotate_right_around_x_axis, (3,2,3))
+    EXPECT1((3,3,2), rotate_right_around_x_axis, (3,1,3))
+    EXPECT1((3,3,3), rotate_right_around_x_axis, (3,0,3))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_right_around_x_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_right_around_x_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_right_around_x_axis, 0xC840D951EA62FB73)
+    EXPECTb(0x38D53645E690546D, rotate_right_around_x_axis, 0x5E334668694DD055)
+}
+
+void test_rotate_left_around_x_axis()
+{
+    EXPECT1((0,0,0), rotate_left_around_x_axis, (0,0,3))
+    EXPECT1((0,0,1), rotate_left_around_x_axis, (0,1,3))
+    EXPECT1((0,0,2), rotate_left_around_x_axis, (0,2,3))
+    EXPECT1((0,0,3), rotate_left_around_x_axis, (0,3,3))
+    EXPECT1((0,1,0), rotate_left_around_x_axis, (0,0,2))
+    EXPECT1((0,1,1), rotate_left_around_x_axis, (0,1,2))
+    EXPECT1((0,1,2), rotate_left_around_x_axis, (0,2,2))
+    EXPECT1((0,1,3), rotate_left_around_x_axis, (0,3,2))
+    EXPECT1((0,2,0), rotate_left_around_x_axis, (0,0,1))
+    EXPECT1((0,2,1), rotate_left_around_x_axis, (0,1,1))
+    EXPECT1((0,2,2), rotate_left_around_x_axis, (0,2,1))
+    EXPECT1((0,2,3), rotate_left_around_x_axis, (0,3,1))
+    EXPECT1((0,3,0), rotate_left_around_x_axis, (0,0,0))
+    EXPECT1((0,3,1), rotate_left_around_x_axis, (0,1,0))
+    EXPECT1((0,3,2), rotate_left_around_x_axis, (0,2,0))
+    EXPECT1((0,3,3), rotate_left_around_x_axis, (0,3,0))
+    EXPECT1((1,0,0), rotate_left_around_x_axis, (1,0,3))
+    EXPECT1((1,0,1), rotate_left_around_x_axis, (1,1,3))
+    EXPECT1((1,0,2), rotate_left_around_x_axis, (1,2,3))
+    EXPECT1((1,0,3), rotate_left_around_x_axis, (1,3,3))
+    EXPECT1((1,1,0), rotate_left_around_x_axis, (1,0,2))
+    EXPECT1((1,1,1), rotate_left_around_x_axis, (1,1,2))
+    EXPECT1((1,1,2), rotate_left_around_x_axis, (1,2,2))
+    EXPECT1((1,1,3), rotate_left_around_x_axis, (1,3,2))
+    EXPECT1((1,2,0), rotate_left_around_x_axis, (1,0,1))
+    EXPECT1((1,2,1), rotate_left_around_x_axis, (1,1,1))
+    EXPECT1((1,2,2), rotate_left_around_x_axis, (1,2,1))
+    EXPECT1((1,2,3), rotate_left_around_x_axis, (1,3,1))
+    EXPECT1((1,3,0), rotate_left_around_x_axis, (1,0,0))
+    EXPECT1((1,3,1), rotate_left_around_x_axis, (1,1,0))
+    EXPECT1((1,3,2), rotate_left_around_x_axis, (1,2,0))
+    EXPECT1((1,3,3), rotate_left_around_x_axis, (1,3,0))
+    EXPECT1((2,0,0), rotate_left_around_x_axis, (2,0,3))
+    EXPECT1((2,0,1), rotate_left_around_x_axis, (2,1,3))
+    EXPECT1((2,0,2), rotate_left_around_x_axis, (2,2,3))
+    EXPECT1((2,0,3), rotate_left_around_x_axis, (2,3,3))
+    EXPECT1((2,1,0), rotate_left_around_x_axis, (2,0,2))
+    EXPECT1((2,1,1), rotate_left_around_x_axis, (2,1,2))
+    EXPECT1((2,1,2), rotate_left_around_x_axis, (2,2,2))
+    EXPECT1((2,1,3), rotate_left_around_x_axis, (2,3,2))
+    EXPECT1((2,2,0), rotate_left_around_x_axis, (2,0,1))
+    EXPECT1((2,2,1), rotate_left_around_x_axis, (2,1,1))
+    EXPECT1((2,2,2), rotate_left_around_x_axis, (2,2,1))
+    EXPECT1((2,2,3), rotate_left_around_x_axis, (2,3,1))
+    EXPECT1((2,3,0), rotate_left_around_x_axis, (2,0,0))
+    EXPECT1((2,3,1), rotate_left_around_x_axis, (2,1,0))
+    EXPECT1((2,3,2), rotate_left_around_x_axis, (2,2,0))
+    EXPECT1((2,3,3), rotate_left_around_x_axis, (2,3,0))
+    EXPECT1((3,0,0), rotate_left_around_x_axis, (3,0,3))
+    EXPECT1((3,0,1), rotate_left_around_x_axis, (3,1,3))
+    EXPECT1((3,0,2), rotate_left_around_x_axis, (3,2,3))
+    EXPECT1((3,0,3), rotate_left_around_x_axis, (3,3,3))
+    EXPECT1((3,1,0), rotate_left_around_x_axis, (3,0,2))
+    EXPECT1((3,1,1), rotate_left_around_x_axis, (3,1,2))
+    EXPECT1((3,1,2), rotate_left_around_x_axis, (3,2,2))
+    EXPECT1((3,1,3), rotate_left_around_x_axis, (3,3,2))
+    EXPECT1((3,2,0), rotate_left_around_x_axis, (3,0,1))
+    EXPECT1((3,2,1), rotate_left_around_x_axis, (3,1,1))
+    EXPECT1((3,2,2), rotate_left_around_x_axis, (3,2,1))
+    EXPECT1((3,2,3), rotate_left_around_x_axis, (3,3,1))
+    EXPECT1((3,3,0), rotate_left_around_x_axis, (3,0,0))
+    EXPECT1((3,3,1), rotate_left_around_x_axis, (3,1,0))
+    EXPECT1((3,3,2), rotate_left_around_x_axis, (3,2,0))
+    EXPECT1((3,3,3), rotate_left_around_x_axis, (3,3,0))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_left_around_x_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_left_around_x_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_left_around_x_axis, 0x37BF26AE159D048C)
+    EXPECTb(0x38D53645E690546D, rotate_left_around_x_axis, 0x550DD496866433E5)
+}
+
+void test_rotate_right_around_y_axis()
+{
+    EXPECT1((0,0,0), rotate_right_around_y_axis, (0,0,3))
+    EXPECT1((0,0,1), rotate_right_around_y_axis, (1,0,3))
+    EXPECT1((0,0,2), rotate_right_around_y_axis, (2,0,3))
+    EXPECT1((0,0,3), rotate_right_around_y_axis, (3,0,3))
+    EXPECT1((0,1,0), rotate_right_around_y_axis, (0,1,3))
+    EXPECT1((0,1,1), rotate_right_around_y_axis, (1,1,3))
+    EXPECT1((0,1,2), rotate_right_around_y_axis, (2,1,3))
+    EXPECT1((0,1,3), rotate_right_around_y_axis, (3,1,3))
+    EXPECT1((0,2,0), rotate_right_around_y_axis, (0,2,3))
+    EXPECT1((0,2,1), rotate_right_around_y_axis, (1,2,3))
+    EXPECT1((0,2,2), rotate_right_around_y_axis, (2,2,3))
+    EXPECT1((0,2,3), rotate_right_around_y_axis, (3,2,3))
+    EXPECT1((0,3,0), rotate_right_around_y_axis, (0,3,3))
+    EXPECT1((0,3,1), rotate_right_around_y_axis, (1,3,3))
+    EXPECT1((0,3,2), rotate_right_around_y_axis, (2,3,3))
+    EXPECT1((0,3,3), rotate_right_around_y_axis, (3,3,3))
+    EXPECT1((1,0,0), rotate_right_around_y_axis, (0,0,2))
+    EXPECT1((1,0,1), rotate_right_around_y_axis, (1,0,2))
+    EXPECT1((1,0,2), rotate_right_around_y_axis, (2,0,2))
+    EXPECT1((1,0,3), rotate_right_around_y_axis, (3,0,2))
+    EXPECT1((1,1,0), rotate_right_around_y_axis, (0,1,2))
+    EXPECT1((1,1,1), rotate_right_around_y_axis, (1,1,2))
+    EXPECT1((1,1,2), rotate_right_around_y_axis, (2,1,2))
+    EXPECT1((1,1,3), rotate_right_around_y_axis, (3,1,2))
+    EXPECT1((1,2,0), rotate_right_around_y_axis, (0,2,2))
+    EXPECT1((1,2,1), rotate_right_around_y_axis, (1,2,2))
+    EXPECT1((1,2,2), rotate_right_around_y_axis, (2,2,2))
+    EXPECT1((1,2,3), rotate_right_around_y_axis, (3,2,2))
+    EXPECT1((1,3,0), rotate_right_around_y_axis, (0,3,2))
+    EXPECT1((1,3,1), rotate_right_around_y_axis, (1,3,2))
+    EXPECT1((1,3,2), rotate_right_around_y_axis, (2,3,2))
+    EXPECT1((1,3,3), rotate_right_around_y_axis, (3,3,2))
+    EXPECT1((2,0,0), rotate_right_around_y_axis, (0,0,1))
+    EXPECT1((2,0,1), rotate_right_around_y_axis, (1,0,1))
+    EXPECT1((2,0,2), rotate_right_around_y_axis, (2,0,1))
+    EXPECT1((2,0,3), rotate_right_around_y_axis, (3,0,1))
+    EXPECT1((2,1,0), rotate_right_around_y_axis, (0,1,1))
+    EXPECT1((2,1,1), rotate_right_around_y_axis, (1,1,1))
+    EXPECT1((2,1,2), rotate_right_around_y_axis, (2,1,1))
+    EXPECT1((2,1,3), rotate_right_around_y_axis, (3,1,1))
+    EXPECT1((2,2,0), rotate_right_around_y_axis, (0,2,1))
+    EXPECT1((2,2,1), rotate_right_around_y_axis, (1,2,1))
+    EXPECT1((2,2,2), rotate_right_around_y_axis, (2,2,1))
+    EXPECT1((2,2,3), rotate_right_around_y_axis, (3,2,1))
+    EXPECT1((2,3,0), rotate_right_around_y_axis, (0,3,1))
+    EXPECT1((2,3,1), rotate_right_around_y_axis, (1,3,1))
+    EXPECT1((2,3,2), rotate_right_around_y_axis, (2,3,1))
+    EXPECT1((2,3,3), rotate_right_around_y_axis, (3,3,1))
+    EXPECT1((3,0,0), rotate_right_around_y_axis, (0,0,0))
+    EXPECT1((3,0,1), rotate_right_around_y_axis, (1,0,0))
+    EXPECT1((3,0,2), rotate_right_around_y_axis, (2,0,0))
+    EXPECT1((3,0,3), rotate_right_around_y_axis, (3,0,0))
+    EXPECT1((3,1,0), rotate_right_around_y_axis, (0,1,0))
+    EXPECT1((3,1,1), rotate_right_around_y_axis, (1,1,0))
+    EXPECT1((3,1,2), rotate_right_around_y_axis, (2,1,0))
+    EXPECT1((3,1,3), rotate_right_around_y_axis, (3,1,0))
+    EXPECT1((3,2,0), rotate_right_around_y_axis, (0,2,0))
+    EXPECT1((3,2,1), rotate_right_around_y_axis, (1,2,0))
+    EXPECT1((3,2,2), rotate_right_around_y_axis, (2,2,0))
+    EXPECT1((3,2,3), rotate_right_around_y_axis, (3,2,0))
+    EXPECT1((3,3,0), rotate_right_around_y_axis, (0,3,0))
+    EXPECT1((3,3,1), rotate_right_around_y_axis, (1,3,0))
+    EXPECT1((3,3,2), rotate_right_around_y_axis, (2,3,0))
+    EXPECT1((3,3,3), rotate_right_around_y_axis, (3,3,0))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_right_around_y_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_right_around_y_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_right_around_y_axis, 0x0F0F00FF55553333)
+    EXPECTb(0x38D53645E690546D, rotate_right_around_y_axis, 0xD0ADE61037DD28A1)
+}
+
+void test_rotate_left_around_y_axis()
+{
+    EXPECT1((0,0,0), rotate_left_around_y_axis, (3,0,0))
+    EXPECT1((0,0,1), rotate_left_around_y_axis, (2,0,0))
+    EXPECT1((0,0,2), rotate_left_around_y_axis, (1,0,0))
+    EXPECT1((0,0,3), rotate_left_around_y_axis, (0,0,0))
+    EXPECT1((0,1,0), rotate_left_around_y_axis, (3,1,0))
+    EXPECT1((0,1,1), rotate_left_around_y_axis, (2,1,0))
+    EXPECT1((0,1,2), rotate_left_around_y_axis, (1,1,0))
+    EXPECT1((0,1,3), rotate_left_around_y_axis, (0,1,0))
+    EXPECT1((0,2,0), rotate_left_around_y_axis, (3,2,0))
+    EXPECT1((0,2,1), rotate_left_around_y_axis, (2,2,0))
+    EXPECT1((0,2,2), rotate_left_around_y_axis, (1,2,0))
+    EXPECT1((0,2,3), rotate_left_around_y_axis, (0,2,0))
+    EXPECT1((0,3,0), rotate_left_around_y_axis, (3,3,0))
+    EXPECT1((0,3,1), rotate_left_around_y_axis, (2,3,0))
+    EXPECT1((0,3,2), rotate_left_around_y_axis, (1,3,0))
+    EXPECT1((0,3,3), rotate_left_around_y_axis, (0,3,0))
+    EXPECT1((1,0,0), rotate_left_around_y_axis, (3,0,1))
+    EXPECT1((1,0,1), rotate_left_around_y_axis, (2,0,1))
+    EXPECT1((1,0,2), rotate_left_around_y_axis, (1,0,1))
+    EXPECT1((1,0,3), rotate_left_around_y_axis, (0,0,1))
+    EXPECT1((1,1,0), rotate_left_around_y_axis, (3,1,1))
+    EXPECT1((1,1,1), rotate_left_around_y_axis, (2,1,1))
+    EXPECT1((1,1,2), rotate_left_around_y_axis, (1,1,1))
+    EXPECT1((1,1,3), rotate_left_around_y_axis, (0,1,1))
+    EXPECT1((1,2,0), rotate_left_around_y_axis, (3,2,1))
+    EXPECT1((1,2,1), rotate_left_around_y_axis, (2,2,1))
+    EXPECT1((1,2,2), rotate_left_around_y_axis, (1,2,1))
+    EXPECT1((1,2,3), rotate_left_around_y_axis, (0,2,1))
+    EXPECT1((1,3,0), rotate_left_around_y_axis, (3,3,1))
+    EXPECT1((1,3,1), rotate_left_around_y_axis, (2,3,1))
+    EXPECT1((1,3,2), rotate_left_around_y_axis, (1,3,1))
+    EXPECT1((1,3,3), rotate_left_around_y_axis, (0,3,1))
+    EXPECT1((2,0,0), rotate_left_around_y_axis, (3,0,2))
+    EXPECT1((2,0,1), rotate_left_around_y_axis, (2,0,2))
+    EXPECT1((2,0,2), rotate_left_around_y_axis, (1,0,2))
+    EXPECT1((2,0,3), rotate_left_around_y_axis, (0,0,2))
+    EXPECT1((2,1,0), rotate_left_around_y_axis, (3,1,2))
+    EXPECT1((2,1,1), rotate_left_around_y_axis, (2,1,2))
+    EXPECT1((2,1,2), rotate_left_around_y_axis, (1,1,2))
+    EXPECT1((2,1,3), rotate_left_around_y_axis, (0,1,2))
+    EXPECT1((2,2,0), rotate_left_around_y_axis, (3,2,2))
+    EXPECT1((2,2,1), rotate_left_around_y_axis, (2,2,2))
+    EXPECT1((2,2,2), rotate_left_around_y_axis, (1,2,2))
+    EXPECT1((2,2,3), rotate_left_around_y_axis, (0,2,2))
+    EXPECT1((2,3,0), rotate_left_around_y_axis, (3,3,2))
+    EXPECT1((2,3,1), rotate_left_around_y_axis, (2,3,2))
+    EXPECT1((2,3,2), rotate_left_around_y_axis, (1,3,2))
+    EXPECT1((2,3,3), rotate_left_around_y_axis, (0,3,2))
+    EXPECT1((3,0,0), rotate_left_around_y_axis, (3,0,3))
+    EXPECT1((3,0,1), rotate_left_around_y_axis, (2,0,3))
+    EXPECT1((3,0,2), rotate_left_around_y_axis, (1,0,3))
+    EXPECT1((3,0,3), rotate_left_around_y_axis, (0,0,3))
+    EXPECT1((3,1,0), rotate_left_around_y_axis, (3,1,3))
+    EXPECT1((3,1,1), rotate_left_around_y_axis, (2,1,3))
+    EXPECT1((3,1,2), rotate_left_around_y_axis, (1,1,3))
+    EXPECT1((3,1,3), rotate_left_around_y_axis, (0,1,3))
+    EXPECT1((3,2,0), rotate_left_around_y_axis, (3,2,3))
+    EXPECT1((3,2,1), rotate_left_around_y_axis, (2,2,3))
+    EXPECT1((3,2,2), rotate_left_around_y_axis, (1,2,3))
+    EXPECT1((3,2,3), rotate_left_around_y_axis, (0,2,3))
+    EXPECT1((3,3,0), rotate_left_around_y_axis, (3,3,3))
+    EXPECT1((3,3,1), rotate_left_around_y_axis, (2,3,3))
+    EXPECT1((3,3,2), rotate_left_around_y_axis, (1,3,3))
+    EXPECT1((3,3,3), rotate_left_around_y_axis, (0,3,3))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_left_around_y_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_left_around_y_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_left_around_y_axis, 0xCCCCAAAA00FF0F0F)
+    EXPECTb(0x38D53645E690546D, rotate_left_around_y_axis, 0x4158CEBB7680B05B)
+}
+
+void test_rotate_right_around_z_axis()
+{
+    EXPECT1((0,0,0), rotate_right_around_z_axis, (3,0,0))
+    EXPECT1((0,0,1), rotate_right_around_z_axis, (3,0,1))
+    EXPECT1((0,0,2), rotate_right_around_z_axis, (3,0,2))
+    EXPECT1((0,0,3), rotate_right_around_z_axis, (3,0,3))
+    EXPECT1((0,1,0), rotate_right_around_z_axis, (2,0,0))
+    EXPECT1((0,1,1), rotate_right_around_z_axis, (2,0,1))
+    EXPECT1((0,1,2), rotate_right_around_z_axis, (2,0,2))
+    EXPECT1((0,1,3), rotate_right_around_z_axis, (2,0,3))
+    EXPECT1((0,2,0), rotate_right_around_z_axis, (1,0,0))
+    EXPECT1((0,2,1), rotate_right_around_z_axis, (1,0,1))
+    EXPECT1((0,2,2), rotate_right_around_z_axis, (1,0,2))
+    EXPECT1((0,2,3), rotate_right_around_z_axis, (1,0,3))
+    EXPECT1((0,3,0), rotate_right_around_z_axis, (0,0,0))
+    EXPECT1((0,3,1), rotate_right_around_z_axis, (0,0,1))
+    EXPECT1((0,3,2), rotate_right_around_z_axis, (0,0,2))
+    EXPECT1((0,3,3), rotate_right_around_z_axis, (0,0,3))
+    EXPECT1((1,0,0), rotate_right_around_z_axis, (3,1,0))
+    EXPECT1((1,0,1), rotate_right_around_z_axis, (3,1,1))
+    EXPECT1((1,0,2), rotate_right_around_z_axis, (3,1,2))
+    EXPECT1((1,0,3), rotate_right_around_z_axis, (3,1,3))
+    EXPECT1((1,1,0), rotate_right_around_z_axis, (2,1,0))
+    EXPECT1((1,1,1), rotate_right_around_z_axis, (2,1,1))
+    EXPECT1((1,1,2), rotate_right_around_z_axis, (2,1,2))
+    EXPECT1((1,1,3), rotate_right_around_z_axis, (2,1,3))
+    EXPECT1((1,2,0), rotate_right_around_z_axis, (1,1,0))
+    EXPECT1((1,2,1), rotate_right_around_z_axis, (1,1,1))
+    EXPECT1((1,2,2), rotate_right_around_z_axis, (1,1,2))
+    EXPECT1((1,2,3), rotate_right_around_z_axis, (1,1,3))
+    EXPECT1((1,3,0), rotate_right_around_z_axis, (0,1,0))
+    EXPECT1((1,3,1), rotate_right_around_z_axis, (0,1,1))
+    EXPECT1((1,3,2), rotate_right_around_z_axis, (0,1,2))
+    EXPECT1((1,3,3), rotate_right_around_z_axis, (0,1,3))
+    EXPECT1((2,0,0), rotate_right_around_z_axis, (3,2,0))
+    EXPECT1((2,0,1), rotate_right_around_z_axis, (3,2,1))
+    EXPECT1((2,0,2), rotate_right_around_z_axis, (3,2,2))
+    EXPECT1((2,0,3), rotate_right_around_z_axis, (3,2,3))
+    EXPECT1((2,1,0), rotate_right_around_z_axis, (2,2,0))
+    EXPECT1((2,1,1), rotate_right_around_z_axis, (2,2,1))
+    EXPECT1((2,1,2), rotate_right_around_z_axis, (2,2,2))
+    EXPECT1((2,1,3), rotate_right_around_z_axis, (2,2,3))
+    EXPECT1((2,2,0), rotate_right_around_z_axis, (1,2,0))
+    EXPECT1((2,2,1), rotate_right_around_z_axis, (1,2,1))
+    EXPECT1((2,2,2), rotate_right_around_z_axis, (1,2,2))
+    EXPECT1((2,2,3), rotate_right_around_z_axis, (1,2,3))
+    EXPECT1((2,3,0), rotate_right_around_z_axis, (0,2,0))
+    EXPECT1((2,3,1), rotate_right_around_z_axis, (0,2,1))
+    EXPECT1((2,3,2), rotate_right_around_z_axis, (0,2,2))
+    EXPECT1((2,3,3), rotate_right_around_z_axis, (0,2,3))
+    EXPECT1((3,0,0), rotate_right_around_z_axis, (3,3,0))
+    EXPECT1((3,0,1), rotate_right_around_z_axis, (3,3,1))
+    EXPECT1((3,0,2), rotate_right_around_z_axis, (3,3,2))
+    EXPECT1((3,0,3), rotate_right_around_z_axis, (3,3,3))
+    EXPECT1((3,1,0), rotate_right_around_z_axis, (2,3,0))
+    EXPECT1((3,1,1), rotate_right_around_z_axis, (2,3,1))
+    EXPECT1((3,1,2), rotate_right_around_z_axis, (2,3,2))
+    EXPECT1((3,1,3), rotate_right_around_z_axis, (2,3,3))
+    EXPECT1((3,2,0), rotate_right_around_z_axis, (1,3,0))
+    EXPECT1((3,2,1), rotate_right_around_z_axis, (1,3,1))
+    EXPECT1((3,2,2), rotate_right_around_z_axis, (1,3,2))
+    EXPECT1((3,2,3), rotate_right_around_z_axis, (1,3,3))
+    EXPECT1((3,3,0), rotate_right_around_z_axis, (0,3,0))
+    EXPECT1((3,3,1), rotate_right_around_z_axis, (0,3,1))
+    EXPECT1((3,3,2), rotate_right_around_z_axis, (0,3,2))
+    EXPECT1((3,3,3), rotate_right_around_z_axis, (0,3,3))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_right_around_z_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_right_around_z_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_right_around_z_axis, 0x00CA0FCAF0CAFFCA)
+    EXPECTb(0x38D53645E690546D, rotate_right_around_z_axis, 0x6C1D0E3953348F49)
+}
+
+void test_rotate_left_around_z_axis()
+{
+    EXPECT1((0,0,0), rotate_left_around_z_axis, (0,3,0))
+    EXPECT1((0,0,1), rotate_left_around_z_axis, (0,3,1))
+    EXPECT1((0,0,2), rotate_left_around_z_axis, (0,3,2))
+    EXPECT1((0,0,3), rotate_left_around_z_axis, (0,3,3))
+    EXPECT1((0,1,0), rotate_left_around_z_axis, (1,3,0))
+    EXPECT1((0,1,1), rotate_left_around_z_axis, (1,3,1))
+    EXPECT1((0,1,2), rotate_left_around_z_axis, (1,3,2))
+    EXPECT1((0,1,3), rotate_left_around_z_axis, (1,3,3))
+    EXPECT1((0,2,0), rotate_left_around_z_axis, (2,3,0))
+    EXPECT1((0,2,1), rotate_left_around_z_axis, (2,3,1))
+    EXPECT1((0,2,2), rotate_left_around_z_axis, (2,3,2))
+    EXPECT1((0,2,3), rotate_left_around_z_axis, (2,3,3))
+    EXPECT1((0,3,0), rotate_left_around_z_axis, (3,3,0))
+    EXPECT1((0,3,1), rotate_left_around_z_axis, (3,3,1))
+    EXPECT1((0,3,2), rotate_left_around_z_axis, (3,3,2))
+    EXPECT1((0,3,3), rotate_left_around_z_axis, (3,3,3))
+    EXPECT1((1,0,0), rotate_left_around_z_axis, (0,2,0))
+    EXPECT1((1,0,1), rotate_left_around_z_axis, (0,2,1))
+    EXPECT1((1,0,2), rotate_left_around_z_axis, (0,2,2))
+    EXPECT1((1,0,3), rotate_left_around_z_axis, (0,2,3))
+    EXPECT1((1,1,0), rotate_left_around_z_axis, (1,2,0))
+    EXPECT1((1,1,1), rotate_left_around_z_axis, (1,2,1))
+    EXPECT1((1,1,2), rotate_left_around_z_axis, (1,2,2))
+    EXPECT1((1,1,3), rotate_left_around_z_axis, (1,2,3))
+    EXPECT1((1,2,0), rotate_left_around_z_axis, (2,2,0))
+    EXPECT1((1,2,1), rotate_left_around_z_axis, (2,2,1))
+    EXPECT1((1,2,2), rotate_left_around_z_axis, (2,2,2))
+    EXPECT1((1,2,3), rotate_left_around_z_axis, (2,2,3))
+    EXPECT1((1,3,0), rotate_left_around_z_axis, (3,2,0))
+    EXPECT1((1,3,1), rotate_left_around_z_axis, (3,2,1))
+    EXPECT1((1,3,2), rotate_left_around_z_axis, (3,2,2))
+    EXPECT1((1,3,3), rotate_left_around_z_axis, (3,2,3))
+    EXPECT1((2,0,0), rotate_left_around_z_axis, (0,1,0))
+    EXPECT1((2,0,1), rotate_left_around_z_axis, (0,1,1))
+    EXPECT1((2,0,2), rotate_left_around_z_axis, (0,1,2))
+    EXPECT1((2,0,3), rotate_left_around_z_axis, (0,1,3))
+    EXPECT1((2,1,0), rotate_left_around_z_axis, (1,1,0))
+    EXPECT1((2,1,1), rotate_left_around_z_axis, (1,1,1))
+    EXPECT1((2,1,2), rotate_left_around_z_axis, (1,1,2))
+    EXPECT1((2,1,3), rotate_left_around_z_axis, (1,1,3))
+    EXPECT1((2,2,0), rotate_left_around_z_axis, (2,1,0))
+    EXPECT1((2,2,1), rotate_left_around_z_axis, (2,1,1))
+    EXPECT1((2,2,2), rotate_left_around_z_axis, (2,1,2))
+    EXPECT1((2,2,3), rotate_left_around_z_axis, (2,1,3))
+    EXPECT1((2,3,0), rotate_left_around_z_axis, (3,1,0))
+    EXPECT1((2,3,1), rotate_left_around_z_axis, (3,1,1))
+    EXPECT1((2,3,2), rotate_left_around_z_axis, (3,1,2))
+    EXPECT1((2,3,3), rotate_left_around_z_axis, (3,1,3))
+    EXPECT1((3,0,0), rotate_left_around_z_axis, (0,0,0))
+    EXPECT1((3,0,1), rotate_left_around_z_axis, (0,0,1))
+    EXPECT1((3,0,2), rotate_left_around_z_axis, (0,0,2))
+    EXPECT1((3,0,3), rotate_left_around_z_axis, (0,0,3))
+    EXPECT1((3,1,0), rotate_left_around_z_axis, (1,0,0))
+    EXPECT1((3,1,1), rotate_left_around_z_axis, (1,0,1))
+    EXPECT1((3,1,2), rotate_left_around_z_axis, (1,0,2))
+    EXPECT1((3,1,3), rotate_left_around_z_axis, (1,0,3))
+    EXPECT1((3,2,0), rotate_left_around_z_axis, (2,0,0))
+    EXPECT1((3,2,1), rotate_left_around_z_axis, (2,0,1))
+    EXPECT1((3,2,2), rotate_left_around_z_axis, (2,0,2))
+    EXPECT1((3,2,3), rotate_left_around_z_axis, (2,0,3))
+    EXPECT1((3,3,0), rotate_left_around_z_axis, (3,0,0))
+    EXPECT1((3,3,1), rotate_left_around_z_axis, (3,0,1))
+    EXPECT1((3,3,2), rotate_left_around_z_axis, (3,0,2))
+    EXPECT1((3,3,3), rotate_left_around_z_axis, (3,0,3))
+    EXPECTb(0xA5A55A5AA5A55A5A, rotate_left_around_z_axis, 0x5A5AA5A55A5AA5A5)
+    EXPECTb(0xCC33CC3333CC33CC, rotate_left_around_z_axis, 0x33CC33CCCC33CC33)
+    EXPECTb(0x0123456789ABCDEF, rotate_left_around_z_axis, 0x530053F0530F53FF)
+    EXPECTb(0x38D53645E690546D, rotate_left_around_z_axis, 0xB8369C702CCA92F1)
 }
 
 int main()
 {
-    EXPECT((0,0,0), rotate_right_around_x_axis, (0,3,0));
-    EXPECT((1,0,0), rotate_right_around_x_axis, (1,3,0));
-    EXPECT((2,1,1), rotate_right_around_x_axis, (2,2,1));
-    EXPECT((2,2,1), rotate_right_around_x_axis, (2,2,2));
-    EXPECT((0,3,0), rotate_right_around_x_axis, (0,3,3));
-
-    EXPECT((0,3,0), rotate_left_around_x_axis, (0,0,0));
-    EXPECT((1,3,0), rotate_left_around_x_axis, (1,0,0));
-    EXPECT((2,2,1), rotate_left_around_x_axis, (2,1,1));
-    EXPECT((2,2,2), rotate_left_around_x_axis, (2,2,1));
-    EXPECT((0,3,3), rotate_left_around_x_axis, (0,3,0));
-
-    EXPECT((0,0,0), rotate_right_around_y_axis, (0,0,3));
-    EXPECT((1,0,0), rotate_right_around_y_axis, (0,0,2));
-    EXPECT((2,1,1), rotate_right_around_y_axis, (1,1,1));
-    EXPECT((2,2,1), rotate_right_around_y_axis, (1,2,1));
-    EXPECT((0,3,0), rotate_right_around_y_axis, (0,3,3));
-
-    EXPECT((0,0,3), rotate_left_around_y_axis, (0,0,0));
-    EXPECT((0,0,2), rotate_left_around_y_axis, (1,0,0));
-    EXPECT((1,1,1), rotate_left_around_y_axis, (2,1,1));
-    EXPECT((1,2,1), rotate_left_around_y_axis, (2,2,1));
-    EXPECT((0,3,3), rotate_left_around_y_axis, (0,3,0));
-
-    EXPECT((0,0,0), rotate_right_around_z_axis, (3,0,0));
-    EXPECT((1,0,0), rotate_right_around_z_axis, (3,1,0));
-    EXPECT((2,1,1), rotate_right_around_z_axis, (2,2,1));
-    EXPECT((2,2,1), rotate_right_around_z_axis, (1,2,1));
-    EXPECT((0,3,0), rotate_right_around_z_axis, (0,0,0));
-
-    EXPECT((3,0,0), rotate_left_around_z_axis, (0,0,0));
-    EXPECT((3,1,0), rotate_left_around_z_axis, (1,0,0));
-    EXPECT((2,2,1), rotate_left_around_z_axis, (2,1,1));
-    EXPECT((1,2,1), rotate_left_around_z_axis, (2,2,1));
-    EXPECT((0,0,0), rotate_left_around_z_axis, (0,3,0));
-
+    test_rotate_right_around_x_axis();
+    test_rotate_left_around_x_axis();
+    test_rotate_right_around_y_axis();
+    test_rotate_left_around_y_axis();
+    test_rotate_right_around_z_axis();
+    test_rotate_left_around_z_axis();
     printf("All tests finished. %d passed, %d failed.\n", passed, failed);
 }

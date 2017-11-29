@@ -5,4 +5,7 @@ test_rotations: test_rotations.cc rotations.h
 	$(CXX) $(CXXFLAGS) test_rotations.cc -o $@
 
 rotations.h: generate_rotations.py
-	./generate_rotations.py > rotations.h
+	./generate_rotations.py --rotl > rotations.h
+
+test_rotations.cc: generate_rotations.py
+	./generate_rotations.py --tests > test_rotations.cc

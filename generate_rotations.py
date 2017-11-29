@@ -1,7 +1,26 @@
 #!/usr/bin/env python
 
+import argparse
+
 def board_with_one_bit_set(x, y, z):
     return 1 << (16*z + 4*y + x)
+
+def coords_from_board(bb):
+    for x in range(4):
+        for y in range(4):
+            for z in range(4):
+                if board_with_one_bit_set(x, y, z) == bb:
+                    return (x, y, z)
+    assert False
+
+def permute_bits(bb, original, rotated):
+    result = 0
+    for i in xrange(64):
+        o = 63 - original[i]
+        r = rotated.index(original[i])
+        if (bb & (1 << i)):
+            result |= (1 << r)
+    return result
 
 def to_hex(mask):
     return "0x%04X'%04X'%04X'%04X" % (
@@ -25,6 +44,26 @@ def rotl_function_defn(function_name, original, rotated):
         mask = sum(1 << b for b in bits)
         defn += '    r |= rotl(o, %d) & %s;\n' % (amount, to_hex(mask))
     defn += '    return r;\n'
+    defn += '}'
+    return defn
+
+def test_function_defn(function_name, original, rotated):
+    defn = 'void test_%s()\n' % function_name
+    defn += '{\n'
+    for x in range(4):
+        for y in range(4):
+            for z in range(4):
+                inbb = board_with_one_bit_set(x, y, z)
+                outbb = permute_bits(inbb, original, rotated)
+                ex, ey, ez = coords_from_board(outbb)
+                defn += '    EXPECT1((%d,%d,%d), %s, (%d,%d,%d))\n' % (
+                    x, y, z, function_name, ex, ey, ez,
+                )
+    for inbb in [0xA5A55A5AA5A55A5A, 0xCC33CC3333CC33CC, 0x123456789ABCDEF, 0x38D53645E690546D]:
+        outbb = permute_bits(inbb, original, rotated)
+        defn += '    EXPECTb(0x%016X, %s, 0x%016X)\n' % (
+            inbb, function_name, outbb,
+        )
     defn += '}'
     return defn
 
@@ -104,13 +143,68 @@ rotated_around_z_axis = [
                                                  0,  4,  8,  12,
 ]
 
-print '#pragma once'
-print '#include <stdint.h>'
-print '#include "utilities.h"'
-print ''
-print rotl_function_defn('rotate_right_around_x_axis', original, rotated_around_x_axis)
-print rotl_function_defn('rotate_left_around_x_axis', rotated_around_x_axis, original)
-print rotl_function_defn('rotate_right_around_y_axis', original, rotated_around_y_axis)
-print rotl_function_defn('rotate_left_around_y_axis', rotated_around_y_axis, original)
-print rotl_function_defn('rotate_right_around_z_axis', original, rotated_around_z_axis)
-print rotl_function_defn('rotate_left_around_z_axis', rotated_around_z_axis, original)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rotl', action='store_true', help='Generate rotl-based "rotations.h" and dump to stdout')
+    parser.add_argument('--tests', action='store_true', help='Generate "test_rotations.cc" and dump to stdout')
+    options = parser.parse_args()
+
+    if options.rotl:
+        print '#pragma once'
+        print '#include <stdint.h>'
+        print '#include "utilities.h"\n'
+        print rotl_function_defn('rotate_right_around_x_axis', original, rotated_around_x_axis) + '\n'
+        print rotl_function_defn('rotate_left_around_x_axis', rotated_around_x_axis, original) + '\n'
+        print rotl_function_defn('rotate_right_around_y_axis', original, rotated_around_y_axis) + '\n'
+        print rotl_function_defn('rotate_left_around_y_axis', rotated_around_y_axis, original) + '\n'
+        print rotl_function_defn('rotate_right_around_z_axis', original, rotated_around_z_axis) + '\n'
+        print rotl_function_defn('rotate_left_around_z_axis', rotated_around_z_axis, original) + '\n'
+
+    if options.tests:
+        print r"""
+#include <stdio.h>
+#include <stdint.h>
+
+#include "rotations.h"
+#include "utilities.h"
+
+static int passed, failed;
+#define EXPECT1(input, f, expected) \
+    if (f(board_with_one_bit_set input) != board_with_one_bit_set expected) { \
+        printf("FAIL: %s(%s %016llx) = %016llx when we expected %016llx\n", \
+            #f, #input, (unsigned long long)board_with_one_bit_set input, \
+            (unsigned long long)f(board_with_one_bit_set input), \
+            (unsigned long long)board_with_one_bit_set expected); \
+        failed += 1; \
+    } else { \
+        passed += 1; \
+    }
+
+#define EXPECTb(input, f, expected) \
+    if (f(input) != expected) { \
+        printf("FAIL: %s(%016llx) = %016llx when we expected %016llx\n", \
+            #f, (unsigned long long)input, \
+            (unsigned long long)f(input), \
+            (unsigned long long)expected); \
+        failed += 1; \
+    } else { \
+        passed += 1; \
+    }
+
+"""
+        print test_function_defn('rotate_right_around_x_axis', original, rotated_around_x_axis) + '\n'
+        print test_function_defn('rotate_left_around_x_axis', rotated_around_x_axis, original) + '\n'
+        print test_function_defn('rotate_right_around_y_axis', original, rotated_around_y_axis) + '\n'
+        print test_function_defn('rotate_left_around_y_axis', rotated_around_y_axis, original) + '\n'
+        print test_function_defn('rotate_right_around_z_axis', original, rotated_around_z_axis) + '\n'
+        print test_function_defn('rotate_left_around_z_axis', rotated_around_z_axis, original) + '\n'
+        print 'int main()'
+        print '{'
+        print '    test_rotate_right_around_x_axis();'
+        print '    test_rotate_left_around_x_axis();'
+        print '    test_rotate_right_around_y_axis();'
+        print '    test_rotate_left_around_y_axis();'
+        print '    test_rotate_right_around_z_axis();'
+        print '    test_rotate_left_around_z_axis();'
+        print r'    printf("All tests finished. %d passed, %d failed.\n", passed, failed);'
+        print '}'

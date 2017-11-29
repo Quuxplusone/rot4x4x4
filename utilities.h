@@ -1,5 +1,10 @@
 #pragma once
 
+inline constexpr uint64_t board_with_one_bit_set(int x, int y, int z)
+{
+    return 1uLL << (16*z + 4*y + x);
+}
+
 inline constexpr uint64_t rotl(uint64_t x, int k)
 {
     return (x << k) | (x >> (64-k));
